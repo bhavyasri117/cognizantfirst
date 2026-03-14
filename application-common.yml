@@ -1,45 +1,74 @@
-spring.datasource.hikari.connection-timeout=20000
-spring.datasource.hikari.minimum-idle=5
-spring.datasource.hikari.maximum-pool-size=12
-spring.datasource.hikari.idle-timeout=300000
-spring.datasource.hikari.max-lifetime=1200000
-#spring.jpa.database-platform=org.hibernate.dialect.MySQL8Dialect
-# JPA (JpaBaseConfiguration, HibernateJpaAutoConfiguration)
-spring.jpa.generate-ddl=true
-spring.jpa.hibernate.ddl-auto=update
-spring.jpa.database=default
-spring.jpa.show-sql=true
-spring.datasource.generate-unique-name=false
-spring.jpa.hibernate.naming.implicit-strategy=org.hibernate.boot.model.naming.ImplicitNamingStrategyLegacyJpaImpl
-spring.jpa.hibernate.naming.physical-strategy=org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+# Database & Hikari Connection Pool Settings
+spring:
+  datasource:
+    generate-unique-name: false
+    hikari:
+      connection-timeout: 20000
+      minimum-idle: 5
+      maximum-pool-size: 12
+      idle-timeout: 300000
+      max-lifetime: 1200000
 
-#actuator properties
-management.endpoints.web.exposure.include=*
-management.endpoint.health.show-details=always
+  # JPA / Hibernate Settings
+  jpa:
+    generate-ddl: true
+    show-sql: true
+    database: default
+    hibernate:
+      ddl-auto: update
+      naming:
+        implicit-strategy: org.hibernate.boot.model.naming.ImplicitNamingStrategyLegacyJpaImpl
+        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
 
-# === Resource server JWT validation ===
-spring.security.oauth2.resourceserver.jwt.issuer-uri=http://localhost:8080/realms/master
+  # Security & Keycloak (OAuth2)
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8080/realms/master
 
-# === Used by OpenAPI config below ===
-keycloak.issuer=http://localhost:8080/realms/master
-# Keycloak Realm
-keycloak.realm= master
-#springdoc.swagger-ui.oauth.client-id=swagger-ui
-springdoc.swagger-ui.oauth.use-pkce-with-authorization-code-grant=true
+  # Kafka Settings
+  kafka:
+    bootstrap-servers: localhost:9092
+    consumer:
+      group-id: travel-group
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
 
-#eureka client properties
-eureka.client.service-url.defaultZone=http://localhost:8761/eureka/
-eureka.instance.prefer-ip-address=false
-eureka.instance.hostname=localhost
-eureka.instance.lease-renewal-interval-in-seconds=10
-eureka.instance.lease-expiration-duration-in-seconds=30
-eureka.client.register-with-eureka=true
-eureka.client.fetch-registry=false
-eureka.instance.instance-id=${spring.application.name}:${spring.application.instance_id:${random.value}}
+# Custom Properties
+topicName: travels
 
-#kafka
-spring.kafka.bootstrap-servers=localhost:9092
-spring.kafka.consumer.group-id=travel-group
-spring.kafka.producer.key-serializer=org.apache.kafka.common.serialization.StringSerializer
-spring.kafka.producer.value-serializer=org.apache.kafka.common.serialization.StringSerializer
-topicName=travels
+keycloak:
+  issuer: http://localhost:8080/realms/master
+  realm: master
+
+# Actuator Endpoints
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    health:
+      show-details: always
+
+# Swagger / OpenAPI
+springdoc:
+  swagger-ui:
+    oauth:
+      use-pkce-with-authorization-code-grant: true
+
+# Eureka Client Settings
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+    register-with-eureka: true
+    fetch-registry: false
+  instance:
+    prefer-ip-address: false
+    hostname: localhost
+    lease-renewal-interval-in-seconds: 10
+    lease-expiration-duration-in-seconds: 30
+    instance-id: ${spring.application.name}:${spring.application.instance_id:${random.value}}
